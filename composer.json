@@ -1,0 +1,17 @@
+{
+	"name": "code-atlantic/chophper",
+	"description": "Code Atlantic Coding Standards",
+	"version": "1.0.0",
+	"minimum-stability": "dev",
+	"require": {
+		"masterminds/html5": "^2.8.1"
+	},
+	"license": "MIT",
+	"config": {
+	},
+	"autoload": {
+		"psr-4": {
+			"Chophper\\": "src/"
+		}
+	}
+}
