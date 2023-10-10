@@ -28,8 +28,10 @@ use function Chophper\ht_strtoupper;
 class Full
 {
     public static $default_options = [
-        'ellipsis'        => '…',
-        'length_in_chars' => false,
+        'ellipsis'            => '…',
+        'length_in_chars'     => false,
+        'length_in_sentences' => false,
+        'length_in_blocks'    => false,
     ];
 
     // These tags are allowed to have an ellipsis inside.
@@ -77,7 +79,7 @@ class Full
     public static function truncate($html, $length, $opts = [])
     {
         if (is_string($opts)) {
-            $opts = ['ellipsis' => $opts];
+            $opts = [ 'ellipsis' => $opts ];
         }
         $opts = array_merge(static::$default_options, $opts);
         // wrap the html in case it consists of adjacent nodes like <p>foo</p><p>bar</p>.
@@ -116,8 +118,13 @@ class Full
             libxml_use_internal_errors($prev_use_errors);
         }
 
-        list($text, $_, $opts) = static::truncateNode($doc, $root_node, $length, $opts);
-        $text                  = ht_substr(ht_substr($text, 0, -6), 5);
+        if ($opts['length_in_blocks']) {
+            list($text, $_, $opts) = static::truncateByBlocks($doc, $root_node, $length, $opts);
+        } else {
+            list($text, $_, $opts) = static::truncateNode($doc, $root_node, $length, $opts);
+        }
+
+        $text = ht_substr(ht_substr($text, 0, -6), 5);
         return $text;
     }
 
@@ -133,12 +140,12 @@ class Full
      */
     protected static function truncateNode($doc, $node, $length, $opts)
     {
-        if ($length === 0 && !static::ellipsable($node)) {
-            return ['', 1, $opts];
+        if ($length === 0 && ! static::ellipsable($node)) {
+            return [ '', 1, $opts ];
         }
         list($inner, $remaining, $opts) = static::innerTruncate($doc, $node, $length, $opts);
         if (0 === ht_strlen($inner)) {
-            return [in_array(ht_strtolower($node->nodeName), static::$self_closing_tags) ? $doc->saveXML($node) : '', $length - $remaining, $opts];
+            return [ in_array(ht_strtolower($node->nodeName), static::$self_closing_tags) ? $doc->saveXML($node) : '', $length - $remaining, $opts ];
         }
         while ($node->firstChild) {
             $node->removeChild($node->firstChild);
@@ -146,7 +153,7 @@ class Full
         $newNode = $doc->createDocumentFragment();
         $newNode->appendXml($inner);
         $node->appendChild($newNode);
-        return [$doc->saveXML($node), $length - $remaining, $opts];
+        return [ $doc->saveXML($node), $length - $remaining, $opts ];
     }
 
     /**
@@ -183,7 +190,43 @@ class Full
                 break;
             }
         }
-        return [$inner, $remaining, $opts];
+        return [ $inner, $remaining, $opts ];
+    }
+
+    /**
+     * Truncate by root-level block elements like p, ul, ol, etc.
+     */
+    protected static function truncateByBlocks($doc, $node, $length, $opts)
+    {
+        $block_tags = ['p', 'ul', 'ol', 'div', 'header', 'article', 'nav', 'section', 'footer', 'aside', 'dd', 'dt', 'dl'];
+        $counter = 0;
+
+        // Create a new document fragment to hold our truncated content
+        $fragment = $doc->createDocumentFragment();
+
+        foreach ($node->childNodes as $childNode) {
+            if ($childNode->nodeType === XML_ELEMENT_NODE && in_array($childNode->nodeName, $block_tags)) {
+                $counter++;
+                if ($counter > $length) {
+                    break;  // exit loop if we've reached the desired number of blocks
+                }
+                // Import the child node to our main document (deep copy) and append it to the fragment
+                $fragment->appendChild($doc->importNode($childNode, true));
+            } elseif ($childNode->nodeType !== XML_ELEMENT_NODE) {
+                // Append other types of nodes (like text nodes) to the fragment directly
+                $fragment->appendChild($doc->importNode($childNode, true));
+            }
+        }
+
+        // Convert fragment back to string
+        $inner = $doc->saveXML($fragment);
+
+        // Add ellipsis if content was truncated
+        if ($counter > $length) {
+            $inner .= $opts['ellipsis'];
+        }
+
+        return [$inner, $counter, $opts];
     }
 
     /**
@@ -201,10 +244,20 @@ class Full
         $xhtml = $node->ownerDocument->saveXML($node);
         preg_match_all('/\s*\S+/', $xhtml, $words);
         $words = $words[0];
-        if ($opts['length_in_chars']) {
+
+        if ($opts['length_in_sentences']) {
+            // Split the text into sentences
+            preg_match_all('/(.*?[.!?]+)(?:\s|$)/us', $xhtml, $sentences);
+            $sentences = $sentences[0];
+            $count     = count($sentences);
+            if ($count <= $length && $length > 0) {
+                return [ $xhtml, $count, $opts ];
+            }
+            return [ implode('', array_slice($sentences, 0, $length)), $count, $opts ];
+        } elseif ($opts['length_in_chars']) {
             $count = ht_strlen($xhtml);
             if ($count <= $length && $length > 0) {
-                return [$xhtml, $count, $opts];
+                return [ $xhtml, $count, $opts ];
             }
             if (count($words) > 1) {
                 $content = '';
@@ -217,15 +270,15 @@ class Full
                     $content .= $word;
                 }
 
-                return [$content, $count, $opts];
+                return [ $content, $count, $opts ];
             }
-            return [ht_substr($node->textContent, 0, $length), $count, $opts];
+            return [ ht_substr($node->textContent, 0, $length), $count, $opts ];
         } else {
             $count = count($words);
             if ($count <= $length && $length > 0) {
-                return [$xhtml, $count, $opts];
+                return [ $xhtml, $count, $opts ];
             }
-            return [implode('', array_slice($words, 0, $length)), $count, $opts];
+            return [ implode('', array_slice($words, 0, $length)), $count, $opts ];
         }
     }
 
@@ -238,7 +291,7 @@ class Full
      */
     protected static function ellipsable($node)
     {
-        return ($node instanceof DOMDocument)
+        return ( $node instanceof DOMDocument )
             || in_array(ht_strtolower($node->nodeName), static::$ellipsable_tags);
     }
 
