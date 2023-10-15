@@ -1,7 +1,7 @@
 {
 	"name": "code-atlantic/chophper",
 	"description": "Code Atlantic Coding Standards",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"minimum-stability": "dev",
 	"require": {
 		"masterminds/html5": "^2.8.1"
