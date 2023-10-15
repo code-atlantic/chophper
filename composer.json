@@ -1,6 +1,6 @@
 {
 	"name": "code-atlantic/chophper",
-	"description": "Code Atlantic Coding Standards",
+	"description": "HTML text truncation library for PHP",
 	"version": "0.1.0",
 	"minimum-stability": "dev",
 	"require": {
