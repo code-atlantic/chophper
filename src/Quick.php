@@ -12,7 +12,7 @@
 
 namespace Chophper;
 
-use ContentControlPro\Vendor\Masterminds\HTML5;
+use Masterminds\HTML5;
 
 /**
  * Class to handle HTML truncation.
