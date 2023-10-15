@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Truncation functions.
  *
@@ -16,9 +17,8 @@ use ContentControlPro\Vendor\Masterminds\HTML5;
 /**
  * Class to handle HTML truncation.
  */
-class HTML
+class Quick
 {
-
     /**
      * HTML parser.
      *
@@ -31,20 +31,20 @@ class HTML
         $this->parser = new HTML5();
     }
 
-    public function safe_strip_tags( $text, $remove_breaks = false )
+    public function safe_strip_tags($text, $remove_breaks = false)
     {
-        if (is_null($text) ) {
+        if (is_null($text)) {
             return '';
         }
 
-        if (! is_scalar($text) ) {
+        if (! is_scalar($text)) {
             return '';
         }
 
         $text = preg_replace('@<(script|style)[^>]*?>.*?</\\1>@si', '', $text);
         $text = strip_tags($text);
 
-        if ($remove_breaks ) {
+        if ($remove_breaks) {
             $text = preg_replace('/[\r\n\t ]+/', ' ', $text);
         }
 
@@ -62,12 +62,12 @@ class HTML
      *
      * @return string
      */
-    public function truncate_words( $html, $words )
+    public function truncate_words($html, $words)
     {
         // First lets check if we need to truncate at all.
         $stripped_html_word_count = str_word_count($this->safe_strip_tags($html));
 
-        if ($stripped_html_word_count <= $words ) {
+        if ($stripped_html_word_count <= $words) {
             return $html;
         }
 
@@ -76,12 +76,12 @@ class HTML
         $truncated_html = '';
         $word_count     = 0;
 
-        foreach ( $parsed->childNodes as $node ) {
-            if ($node->nodeType === XML_TEXT_NODE ) {
+        foreach ($parsed->childNodes as $node) {
+            if ($node->nodeType === XML_TEXT_NODE) {
                 $words_in_node = preg_split('/\s+/', $node->textContent, -1, PREG_SPLIT_NO_EMPTY);
 
-                foreach ( $words_in_node as $word ) {
-                    if ($word_count < $words ) {
+                foreach ($words_in_node as $word) {
+                    if ($word_count < $words) {
                         $truncated_html .= $word . ' ';
                     }
 
@@ -91,14 +91,14 @@ class HTML
                 $truncated_html .= $this->parser->saveHTML($node);
             }
 
-            if ($word_count >= $words ) {
+            if ($word_count >= $words) {
                 break;
             }
         }
 
         $truncated_html = trim($truncated_html);
 
-        if ('>' === substr($truncated_html, -1) ) {
+        if ('>' === substr($truncated_html, -1)) {
             $truncated_html = substr($truncated_html, 0, strrpos($truncated_html, '<'));
         }
 
