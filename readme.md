@@ -4,10 +4,10 @@ Chophper is a PHP utility for truncating text within HTML to a given length with
 
 Support for:
 
-- Truncating chars, optionally respecting word boundaries
-- Truncating words, optionally respecting sentence boundaries
-- Truncating sentences, optionally respecting block boundaries
-- Truncating blocks (paragraphs, lists, etc.)
+- Truncate chars, optionally respecting word boundaries
+- Truncate words, optionally respecting sentence boundaries
+- Truncate sentences, optionally respecting block boundaries
+- Truncate blocks (paragraphs, lists, etc.)
 - Preserving HTML tags
 - Preserving HTML entities
 
