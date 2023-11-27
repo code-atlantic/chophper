@@ -86,7 +86,7 @@ class Full
         $root_node = null;
 
         // Parse using HTML5Lib if it's available.
-        if (class_exists('ContentControlPro\Vendor\Masterminds\HTML5')) {
+        if (class_exists('Masterminds\HTML5')) {
             try {
                 $html5     = new HTML5();
                 $doc       = $html5->loadHTML($html);
