@@ -6,12 +6,22 @@
 	"require": {
 		"masterminds/html5": "^2.8.1"
 	},
+	"require-dev": {
+		"code-atlantic/coding-standards": "^1.1.0"
+	},
 	"license": "MIT",
 	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
 	},
 	"autoload": {
 		"psr-4": {
 			"Chophper\\": "src/"
 		}
+	},
+	"scripts": {
+		"format": "vendor/bin/phpcbf --standard=.phpcs.xml.dist --report-summary --report-source",
+		"lint": "vendor/bin/phpcs --standard=.phpcs.xml.dist"
 	}
 }

@@ -1,13 +1,16 @@
 <?php
 /**
- * @license proprietary?
+ * Invalid HTML exception.
  *
- * Modified by code-atlantic on 10-October-2023 using Strauss.
- * @see     https://github.com/BrianHenryIE/strauss
+ * @category Truncation
+ * @package  Chophper
+ * @author   Daniel Iser <daniel@code-atlantic.com>
  */
 
 namespace Chophper\Exceptions;
 
-class InvalidHtmlException extends \Exception
-{
+/**
+ * Exception for invalid HTML.
+ */
+class InvalidHtmlException extends \Exception {
 }
