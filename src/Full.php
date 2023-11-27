@@ -16,6 +16,10 @@ use DOMDocument;
 use Masterminds\HTML5;
 use Chophper\Exceptions\InvalidHtmlException;
 
+use function Chophper\ht_strlen;
+use function Chophper\ht_substr;
+use function Chophper\ht_strtolower;
+
 /**
  * Truncate HTML using full parser.
  */
@@ -82,7 +86,7 @@ class Full
         $root_node = null;
 
         // Parse using HTML5Lib if it's available.
-        if (class_exists('ContentControlPro\Vendor\Masterminds\HTML5')) {
+        if (class_exists('Masterminds\HTML5')) {
             try {
                 $html5     = new HTML5();
                 $doc       = $html5->loadHTML($html);
@@ -118,7 +122,7 @@ class Full
             list($text, $_, $opts) = static::truncateNode($doc, $root_node, $length, $opts);
         }
 
-        $text = \Chophper\ht_substr(\Chophper\ht_substr($text, 0, -6), 5);
+        $text = ht_substr(ht_substr($text, 0, -6), 5);
         return $text;
     }
 
@@ -138,8 +142,8 @@ class Full
             return [ '', 1, $opts ];
         }
         list($inner, $remaining, $opts) = static::innerTruncate($doc, $node, $length, $opts);
-        if (0 === \Chophper\ht_strlen($inner)) {
-            return [ in_array(\Chophper\ht_strtolower($node->nodeName), static::$self_closing_tags) ? $doc->saveXML($node) : '', $length - $remaining, $opts ];
+        if (0 === ht_strlen($inner)) {
+            return [ in_array(ht_strtolower($node->nodeName), static::$self_closing_tags) ? $doc->saveXML($node) : '', $length - $remaining, $opts ];
         }
         while ($node->firstChild) {
             $node->removeChild($node->firstChild);
@@ -249,7 +253,7 @@ class Full
             }
             return [ implode('', array_slice($sentences, 0, $length)), $count, $opts ];
         } elseif ($opts['length_in_chars']) {
-            $count = \Chophper\ht_strlen($xhtml);
+            $count = ht_strlen($xhtml);
             if ($count <= $length && $length > 0) {
                 return [ $xhtml, $count, $opts ];
             }
@@ -257,7 +261,7 @@ class Full
                 $content = '';
 
                 foreach ($words as $word) {
-                    if (\Chophper\ht_strlen($content) + \Chophper\ht_strlen($word) > $length) {
+                    if (ht_strlen($content) + ht_strlen($word) > $length) {
                         break;
                     }
 
@@ -266,7 +270,7 @@ class Full
 
                 return [ $content, $count, $opts ];
             }
-            return [ \Chophper\ht_substr($node->textContent, 0, $length), $count, $opts ];
+            return [ ht_substr($node->textContent, 0, $length), $count, $opts ];
         } else {
             $count = count($words);
             if ($count <= $length && $length > 0) {
@@ -286,7 +290,7 @@ class Full
     protected static function ellipsable($node)
     {
         return ( $node instanceof DOMDocument )
-            || in_array(\Chophper\ht_strtolower($node->nodeName), static::$ellipsable_tags);
+            || in_array(ht_strtolower($node->nodeName), static::$ellipsable_tags);
     }
 
     /**
