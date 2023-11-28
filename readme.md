@@ -41,9 +41,8 @@ $chophper->truncate($html, $length, $options);
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ellipsis` | string | `…` | The string to append to the truncated text. |
-| `length_in_chars` | boolean | `false` | Whether to break the text at char boundaries. |
-| `length_in_sentences` | boolean | `false` | Whether to break the text at sentence boundaries. |
-| `length_in_blocks` | boolean | `false` | Whether to break the text at block-level element boundaries. (`p`, `ul`, `ol`) |
+| `truncateBy` | string | `words` | Whether to break the text by chars, words, sentences or blocks |
+| `preserveWords` | boolean | `false` | Whether to preserve words when using chars truncation. |
 
 ## Options (wisthlist)
 

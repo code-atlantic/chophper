@@ -1,7 +1,7 @@
 {
 	"name": "code-atlantic/chophper",
 	"description": "HTML text truncation library for PHP",
-	"version": "0.2.1",
+	"version": "1.0.0",
 	"minimum-stability": "dev",
 	"require": {
 		"masterminds/html5": "^2.8.1"
