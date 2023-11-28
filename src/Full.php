@@ -261,6 +261,7 @@ class Full {
 			if ( $remaining <= 0 ) {
 				if ( static::is_ellipsable( $node ) ) {
 					$inner = preg_replace( '/(?:[\s\pP]+|(?:&(?:[a-z]+|#[0-9]+);?))*$/u', '', $inner ) . $opts['ellipsis'];
+					$opts['ellipsis'] = ''; // TODO Find a better way to clear this, maybe based on $remaining.
 				}
 				break;
 			}
@@ -316,6 +317,7 @@ class Full {
 		foreach ( $nodes_to_keep as $i => $child_node ) {
 			if ( 0 === $remaining && $i === $new_nodes - 1 ) {
 				$child_node->appendChild( $doc->createTextNode( $opts['ellipsis'] ) );
+				$opts['ellipsis'] = ''; // TODO Find a better way to clear this, maybe based on $remaining.
 			}
 
 			// If the node is a block element, add it to the fragment.
@@ -381,14 +383,14 @@ class Full {
 				];
 
 			case 'chars':
-				// Split the text into words.
+				// Split the text into words, excluding whitespace.
 				preg_match_all( '/\s*\S+/', $xhtml, $words );
 
 				// Get the words.
 				$words = $words[0];
 
 				// Count the words and get the number of words remaining after truncation.
-				$char_count = ht_strlen( $xhtml );
+				$char_count = ht_strlen( trim( $xhtml ) ); // Trim to prevent empty text nodes from counting as a character.
 
 				// If the number of chars is less than or equal to the length, return the text in full.
 				if ( $length > $char_count ) {
