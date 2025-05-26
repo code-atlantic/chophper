@@ -27,13 +27,11 @@ composer require code-atlantic/chophper
 // Full is built to fully support HTML5 without breaking the HTML structure.
 use Chophper\Full as Chophper; 
 
-$chophper = new Chophper();
-
 $options [
     // ... see options below.
 ];
 
-$chophper->truncate($html, $length, $options);
+Chophper::truncate($html, $length, $options);
 ```
 
 ## Options ( current, very subject to change )
