@@ -4,10 +4,19 @@
 	"version": "1.0.1",
 	"minimum-stability": "dev",
 	"require": {
+		"php": ">=5.4.0",
 		"masterminds/html5": "^2.8.1"
 	},
 	"require-dev": {
-		"code-atlantic/coding-standards": "^1.1.0"
+		"code-atlantic/coding-standards": "^1.1.0",
+		"phpunit/phpunit": "^4.8.36 || ^7.5 || ^8.0 || ^9.0"
+	},
+	"suggest": {
+		"ext-dom": "Accelerates HTML parsing",
+		"ext-iconv": "Accelerates character encoding conversions",
+		"ext-intl": "Accelerates internationalization functions",
+		"ext-libxml": "Accelerates XML parsing",
+		"ext-mbstring": "Handles multibyte strings, such as unicode"
 	},
 	"license": "MIT",
 	"config": {
@@ -20,8 +29,14 @@
 			"Chophper\\": "src/"
 		}
 	},
+	"autoload-dev": {
+		"psr-4": {
+			"Chophper\\Tests\\": "tests/"
+		}
+	},
 	"scripts": {
 		"format": "vendor/bin/phpcbf --standard=.phpcs.xml.dist --report-summary --report-source",
-		"lint": "vendor/bin/phpcs --standard=.phpcs.xml.dist"
+		"lint": "vendor/bin/phpcs --standard=.phpcs.xml.dist",
+		"test": "vendor/bin/phpunit"
 	}
 }
